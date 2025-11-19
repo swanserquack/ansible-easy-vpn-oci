@@ -1,33 +1,41 @@
-# Why is this project archived?
-TL;DR: It wasn't as "easy" as the name suggested, and took too much time to develop, test and debug.
+# ansible-easy-vpn
+![CI](https://github.com/swanserquack/ansible-easy-vpn-oci/actions/workflows/ci.yml/badge.svg)
 
-**Long version**
+A simple interactive script that sets up a Wireguard VPN server with Adguard, Unbound and DNSCrypt-Proxy on an Oracle Cloud instance, and lets you manage the config files using a simple WebUI protected by two-factor-authentication.
 
-When developing ansible-easy-vpn, I tried to come up with an easy turn-key solution that would work for everyone, no matter their knowledge of Docker, Ansible, Linux, etc.
+**Have a question or an issue? Read the [FAQ](FAQ.md) first!**
 
-Unfortunately, due to just how different OS configurations and environments are across different VPS/cloud providers, this playbook does not work everywhere.
+## Usage
 
-Moreover, by presenting it as an "easy" solution that doesn't require a deep knowledge of Linux shell, Ansible or Docker, I obfuscated a lot of complexities in the setup, making it difficult for the end user to fix any potential errors. 
-
-At the same time, the errors in question were tricky to debug for me, since I'm not [eating my own dogfood](https://en.wikipedia.org/wiki/Eating_your_own_dog_food) and do not have time to test this playbook on every popular VPS/cloud server there is.
-
-Finally, this playbook was way too intrusive – it was made for setting up a single-purpose VPN server from scratch, taking care of automatic updates, SSH hardening and SSL certificates.
-
-However, most people would want to use their VPS for things other than just a VPN server, and due to the aforementioned reasons, modifying and extending this playbook is difficult unless you know Ansible and Docker well enough.
-
-# So what do I do now?
-
-If you want to get rid of the services managed by this playbook, you will need to stop and remove the Docker containers, and delete their persistent storage:
-```bash
-docker stop authelia wg-easy adguard-unbound-doh watchtower bunkerweb
-docker rm authelia wg-easy adguard-unbound-doh watchtower bunkerweb
-sudo rm -rf /opt/docker
-docker system prune -a
 ```
-The configuration for unattended upgrades, SSH and the non-root user created by the playbook will remain in place.
+wget https://raw.githubusercontent.com/swanserquack/ansible-easy-vpn-oci/main/bootstrap.sh -O bootstrap.sh && bash bootstrap.sh
+```
 
-If you're interested in a similar setup, I recommend using this project as a starting point: https://github.com/notthebee/cloud-homeserver
+## Features
+* Wireguard WebUI (via wg-easy)
+* Two-factor authentication for the WebUI (Authelia)
+* Hardened web server (Bunkerweb)
+* Encrypted DNS resolution with optional ad-blocking functionality (Adguard Home, DNSCrypt and Unbound)
+* IPTables firewall with sane defaults and Fail2Ban
+* Automated and unattended upgrades
+* SSH hardening and public key pair generation (optional, you can also use your own keys)
+* E-mail notifications (using an external SMTP server, e.g. GMail)
 
-This Compose project sets up other services and uses Traefik instead of Bunkerweb, but follows the same purpose – running Dockerized web applications on a cloud server, protected by Authelia.
+## Requirements
+* An instance on Oracle Cloud Infrastructure with:
+  * At least 1 vCPU
+  * At least 1 GB RAM (2 GB recommended)
+  * At least 10 GB of disk space
+* One of the supported Linux distros (Only Ubuntu Server 24.04 has been officially tested):
+  * Ubuntu Server 24.04 (recommended)
+  * Ubuntu Server 22.04
+  * Ubuntu Server 20.04
+  * Debian 11
+  * Debian 12
 
-So long, and thanks for all the fish!
+## Expectations
+This repo is maintained **voluntarily**, I do run my own instance meaning that its continued development and maintenance is in my best interest. This repo is specifically designed to be for instances on Oracle Cloud, no other VPS providers are officially supported. Issues/Questions regarding other VPS providers will be marked as "won't fix" unless the issue is trivial to resolve, could affect Oracle Cloud or is of particular interest to me. 
+
+Whilst I try my best, I cannot reproduce every possible VPS configuration. If you report an issue with a configuration that cannot be reproduced here, please help me solve it by providing one of the following: a minimal, reproducible set of steps and any relevant logs or configuration files; a through description of your configuration or temporary access to a test instance that reproduces the issue. 
+
+Requests/Issues that require long-term or paid resources may be considered out of scope unless I find the request particularly interesting **and** have the resources to act upon it **or** an agreement is made to provide the resources needed to act upon it.

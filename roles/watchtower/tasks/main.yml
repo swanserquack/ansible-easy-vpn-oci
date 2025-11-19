@@ -5,7 +5,7 @@
   until: watchtower_result is succeeded
   community.general.docker_container:
     name: "watchtower"
-    image: "containrrr/watchtower"
+    image: "nickfedor/watchtower"
     pull: yes
     state: "started"
     volumes:
